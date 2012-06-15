@@ -1100,13 +1100,19 @@ $.Window = (function()  {
 			}
 		}
 	
-		function hideContent() {
+		function hideContent(opts) {
+			opts = opts || {};
+			if (! opts.hasOwnProperty('hideFrame')){
+				opts.hideFrame = true;
+			}
 			var bgColor = frame.css("backgroundColor");
 			//log("hideContent: "+bgColor);
 			if( bgColor != null && bgColor != "transparent" && bgColor != "rgba(0, 0, 0, 0)" ) {
 				container.css("backgroundColor", bgColor);
 			}
-			frame.hide();
+			if (opts.hideFrame){
+				frame.hide();
+			}
 			if( options.showFooter ) {
 				footer.hide();
 			}
@@ -1525,8 +1531,14 @@ $.Window = (function()  {
 				height: rwh.h,
 				opacity: 1
 			};
-			
-			hideContent();
+
+			if (options.useOverlay){
+				hideContent();
+			}
+			else{
+				hideContent({hideFrame: false});
+			}
+
 			container.animate(targetCssStyle, setting.animationSpeed, 'swing', function() {
 				container.css('z-index', zIndex);
 				showContent();
