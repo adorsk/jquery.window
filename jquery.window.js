@@ -463,6 +463,7 @@ $.Window = (function()  {
 			scrollable: true,             // [boolean:true] to control show scroll bar or not
 			checkBoundary: false,         // [boolean:false] to check window dialog overflow html body or caller element
 			withinBrowserWindow: false,   // [boolean:false] to limit window only can be dragged within browser window. this attribute only works when checkBoundary is true and caller is null. 
+			useOverlay: false,			  // [boolean:false] to show an overlay when dragging.
 			custBtns: null,               // [json array:null] to describe the customized button display & callback function
 			onOpen: null,                 // [function:null] a callback function while container is added into body
 			onShow: null,                 // [function:null] a callback function while whole window display routine is finished
@@ -726,8 +727,11 @@ $.Window = (function()  {
 							container.css("position", "fixed");
 							container.css(targetCssStyle);
 						}
-						showOverlay();
-						hideContent();
+						if (options.useOverlay){
+							showOverlay();
+							hideContent();
+						}
+
 						// callback
 						if( options.onDrag ) {
 							options.onDrag(_this);
@@ -739,8 +743,10 @@ $.Window = (function()  {
 							container.css("position", "fixed");
 							container.css(targetCssStyle);
 						}
-						hideOverlay();
-						showContent();
+						if (options.useOverlay){
+							hideOverlay();
+							showContent();
+						}
 						// callback
 						if( options.afterDrag ) {
 							options.afterDrag(_this);
