@@ -314,6 +314,7 @@ $.Window = (function()  {
 		var cpos = null;
 		var narrow = setting.minWinNarrow;
 		var long = minWinData.long;
+
 		
 		if( setting.dockArea != null ) {
 			// check original parent panel
@@ -336,7 +337,7 @@ $.Window = (function()  {
 			cpos = getParentPanelStartPos(parent);
 			long = parent.get(0)._minWinData.long;
 		}
-		
+
 		if( setting.dock == 'left' || setting.dock == 'right' ) {
 			targetCss.width = narrow;
 			targetCss.height = long - 1;
@@ -1611,6 +1612,22 @@ $.Window = (function()  {
 		function _decreaseMiniIndex() {
 			miniStackIndex--;
 		}
+
+        function getDimensions() {
+            return {
+                w : container.width(),
+                h : container.height()
+            };
+        }
+
+        function getPosition() {
+            var x = parseFloat(container.css('left'));
+            var y = parseFloat(container.css('top'));
+            return {
+                x: x,
+                y: y
+            };
+        }
 	
 		return { // instance public methods
 			initialize: initialize,
@@ -1644,6 +1661,8 @@ $.Window = (function()  {
 			getUrl: getUrl,                               // get url string
 			getContent: getContent,                       // get frame html content
 			getFooterContent: getFooterContent,           // get footer html content
+            getDimensions: getDimensions,                 // get container dimensions
+            getPosition: getPosition,                   // get container position
 			isMaximized: function() {                     // get window maximized status
 				return maximized;
 			},
