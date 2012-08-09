@@ -462,8 +462,9 @@ $.Window = (function()  {
 			draggable: true,              // [boolean:true] to control window draggable
 			resizable: true,              // [boolean:true] to control window resizable
 			scrollable: true,             // [boolean:true] to control show scroll bar or not
-			checkBoundary: false,         // [boolean:false] to check window dialog overflow html body or caller element
-			withinBrowserWindow: false,   // [boolean:false] to limit window only can be dragged within browser window. this attribute only works when checkBoundary is true and caller is null. 
+			containment: false,           // [various:false] if not false, will be passed to jquery ui draggable's 'containment' option.
+			maximizeContainment: 'caller',// [string|various:caller] maxize to the caller or given element. If null or there is no caller, maximizes to document.
+			withinBrowserWindow: false,   // [boolean:false] to limit window only can be dragged within browser window. this attribute only works when containment is not false and caller is null. 
 			useOverlay: false,			  // [boolean:false] to show an overlay when dragging/resizing.
 			custBtns: null,               // [json array:null] to describe the customized button display & callback function
 			onOpen: null,                 // [function:null] a callback function while container is added into body
@@ -754,12 +755,13 @@ $.Window = (function()  {
 						}
 					}
 				});
-				// set boundary if got opotions
-				if( options.checkBoundary ) {
+				// set containment if given.
+				if( options.containment) {
 					if( options.withinBrowserWindow && caller == null ) {
 						container.draggable('option', 'containment', 'window');
 					} else {
-						container.draggable('option', 'containment', 'parent');
+                        console.log("here");
+						container.draggable('option', 'containment', options.containment);
 					}
 				}
 			}
@@ -806,14 +808,6 @@ $.Window = (function()  {
 						}
 					}
 				});
-				// set boundary if got opotions
-				if( options.checkBoundary ) {
-					// this got bug, so mark it temporarily
-					//container.resizable('option', 'containment', "parent");
-					//if( options.withinBrowserWindow && caller == null ) {
-						//container.resizable('option', 'containment', "window");
-					//}
-				}
 	
 				// set resize min, max width & height
 				if( options.maxWidth >= 0 ) {
@@ -1341,27 +1335,52 @@ $.Window = (function()  {
 			
 			var scrollPos = getBrowserScrollXY();
 			var screenWH = getBrowserScreenWH();
-			if( caller != null ) {
-				var cpos = getParentPanelStartPos(caller);
-				targetCssStyle = {
-					left: cpos.left,
-					top: cpos.top,
-					width: caller.width(),
-					height: caller.height(),
-					opacity: 1
-				};
-			} else {
-				targetCssStyle = {
-					left: scrollPos.left,
-					top: scrollPos.top,
-					width: screenWH.width,
-					height: screenWH.height,
-					opacity: 1
-				};
-			}
+
+            // Fit to caller if maximizing to caller and caller exists.
+            if (options.maximizeContainment == 'caller' && caller != null){
+                // Fit to caller.
+                targetCssStyle = {
+                    left: 0,
+                    top: 0,
+                    width: caller.width(),
+                    height: caller.height(),
+                    opacity: 1
+                };
+            }
+            // Otherwise, if maximize boundary is element, maximize to it.
+            else if ($(options.maximizeContainment).length) {
+                var $target = $(options.maximizeContainment);
+                var targetOffset = $target.offset();
+                var offset = targetOffset;
+                if (caller != null){
+                    callerOffset = caller.offset();
+                    offset.left = targetOffset.left - callerOffset.left;
+                    offset.top = targetOffset.top - callerOffset.top;
+                }
+                targetCssStyle = {
+                    left: offset.left,
+                    top: offset.top,
+                    width: $target.innerWidth(),
+                    height: $target.innerHeight(),
+                    opacity: 1,
+                };
+            }
+            // Otherwise fit to window.
+            else {
+                targetCssStyle = {
+                    left: scrollPos.left,
+                    top: scrollPos.top,
+                    width: screenWH.width,
+                    height: screenWH.height,
+                    opacity: 1
+                };
+            }
 	
 			if( bImmediately ) {
 				container.css(targetCssStyle);
+                if (targetCssPosition){
+                    container.css('position', targetCssPosition);
+                }
 				adjustHeaderTextPanelWidth();
 				adjustFrameWH();
 				header.removeClass('window_header_normal');
