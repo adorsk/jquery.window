@@ -760,7 +760,6 @@ $.Window = (function()  {
 					if( options.withinBrowserWindow && caller == null ) {
 						container.draggable('option', 'containment', 'window');
 					} else {
-                        console.log("here");
 						container.draggable('option', 'containment', options.containment);
 					}
 				}
@@ -1357,11 +1356,12 @@ $.Window = (function()  {
                     offset.left = targetOffset.left - callerOffset.left;
                     offset.top = targetOffset.top - callerOffset.top;
                 }
+                window.t = $target;
                 targetCssStyle = {
                     left: offset.left,
                     top: offset.top,
-                    width: $target.innerWidth(),
-                    height: $target.innerHeight(),
+                    width: $target.width(),
+                    height: $target.height(),
                     opacity: 1,
                 };
             }
