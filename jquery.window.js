@@ -519,16 +519,20 @@ $.Window = (function()  {
 				});
 			}
 
-			if( options.x >= 0 || options.y >= 0 ) {
+            var x = parseFloat(options.x);
+            var y = parseFloat(options.y);
+
+            // Set positions if given.
+			if( ! isNaN(x) || ! isNaN(y)) {
 				var scrollPos = getBrowserScrollXY();
 				// set position x
-				if( options.x >= 0 ) {
+				if( ! isNaN(x) ) {
 					var pLeft = 0;
 					if( caller != null ) {
 						var cpos = getParentPanelStartPos(caller);
-						pLeft = options.x + cpos.left;
+						pLeft = x + cpos.left;
 					} else {
-						pLeft = options.x + scrollPos.left;
+						pLeft = x + scrollPos.left;
 					}
 					container.css("left", pLeft);
 				} else { // put on center
@@ -536,13 +540,13 @@ $.Window = (function()  {
 				}
 	
 				// set position y
-				if( options.y >= 0 ) {
+				if( ! isNaN(y)) {
 					var pTop = 0;
 					if( caller != null ) {
 						var cpos = getParentPanelStartPos(caller);
-						pTop = options.y + cpos.top;
+						pTop = y + cpos.top;
 					} else {
-						pTop = options.y + scrollPos.top;
+						pTop = y + scrollPos.top;
 					}
 					container.css("top", pTop);
 				} else { // put on middle
